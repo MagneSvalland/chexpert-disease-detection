@@ -1,5 +1,6 @@
 # Data
 
-CheXpert-datasettet lastes ned automatisk ved å kjøre første celle i `notebooks/01_eda.ipynb`.
+The CheXpert dataset is automatically downloaded by running the first cell in `notebooks/01_eda.ipynb`.
 
-Du trenger en Kaggle-konto og en Kaggle API-token satt opp i `C:\Users\<ditt-brukernavn>\.kaggle\kaggle.json`
+You will need a Kaggle account and a Kaggle API token set up in `C:\Users\<your-username>\.kaggle\kaggle.json`
+
