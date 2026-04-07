@@ -11,6 +11,10 @@ The goal of this project is to develop and compare deep learning models that can
 - Custom CNN built from scratch with Keras
 - Transfer learning with pre-trained ResNet and DenseNet architectures
 
+## Pre-trained weights
+Pre-trained model weights are available in the `results/` folder in this repository.
+- baseline_cnn_best.keras - Baseline CNN (Mean AUC: 0.865)
+
 ## Data
 CheXpert is downloaded automatically by running the first cell in `notebooks/01_eda.ipynb`. You need a Kaggle account and API token set up locally.
 
