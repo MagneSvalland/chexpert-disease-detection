@@ -1,4 +1,4 @@
-﻿﻿# Chest X-Ray Disease Detection - DAT255
+﻿# Chest X-Ray Disease Detection - DAT255
 
 **Authors:** Magne Svalland, Hans Christian Gustafsson, Jonatan Dam  
 **Course:** DAT255 Deep Learning Engineering  
