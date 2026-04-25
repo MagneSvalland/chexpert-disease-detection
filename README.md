@@ -10,7 +10,7 @@ The goal of this project is to develop and compare deep learning models that can
 ## Web Application
 The model is deployed as a web application where users can upload a chest X-ray and receive predictions with Grad-CAM visualizations.
 
-**[Try the app on Hugging Face Spaces](https://huggingface.co/spaces/Magnen/chexpert-disease-detection)**
+**https://huggingface.co/spaces/Magnen/chexpert-disease-detection**
 
 ## Models
 
@@ -24,10 +24,10 @@ The model is deployed as a web application where users can upload a chest X-ray 
 
 | Notebook | Description |
 |----------|-------------|
-| [01_eda.ipynb](notebooks/01_eda.ipynb) | Exploratory data analysis — label distribution, sample images, and dataset statistics |
-| [02_baseline_cnn.ipynb](notebooks/02_baseline_cnn.ipynb) | Custom CNN trained from scratch using Keras — Mean AUC: 0.865 |
-| [03_transfer_learning.ipynb](notebooks/03_transfer_learning.ipynb) | Transfer learning with DenseNet121 pre-trained on ImageNet — Mean AUC: 0.857 |
-| [04_gradcam.ipynb](notebooks/04_gradcam.ipynb) | Grad-CAM explainability — heatmaps showing which regions influenced each prediction |
+| [01_eda.ipynb](notebooks/01_eda.ipynb) | Exploratory data analysis - label distribution, sample images, and dataset statistics |
+| [02_baseline_cnn.ipynb](notebooks/02_baseline_cnn.ipynb) | Custom CNN trained from scratch using Keras - Mean AUC: 0.865 |
+| [03_transfer_learning.ipynb](notebooks/03_transfer_learning.ipynb) | Transfer learning with DenseNet121 pre-trained on ImageNet - Mean AUC: 0.857 |
+| [04_gradcam.ipynb](notebooks/04_gradcam.ipynb) | Grad-CAM explainability - heatmaps showing which regions influenced each prediction |
 
 ## Pre-trained weights
 - `baseline_cnn_best.keras` — Baseline CNN (5.5 MB) — available in `results/`
