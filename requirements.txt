@@ -1,0 +1,7 @@
+gradio>=4.0
+tensorflow>=2.15
+keras>=3.0
+numpy
+pandas
+matplotlib
+Pillow
