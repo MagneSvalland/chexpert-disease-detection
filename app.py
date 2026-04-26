@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import tensorflow as tf
 import keras
@@ -10,21 +9,29 @@ import gradio as gr
 from PIL import Image
 
 LABELS = ["Atelectasis", "Cardiomegaly", "Consolidation", "Edema", "Pleural Effusion"]
-MODEL_PATH = "results/baseline_cnn_best.keras"
 
-model = keras.models.load_model(MODEL_PATH)
-
-last_conv_layer_name = None
-for layer in reversed(model.layers):
-    if isinstance(layer, layers.Conv2D):
-        last_conv_layer_name = layer.name
-        break
+models = {
+    "Baseline CNN (AUC 0.865)": keras.models.load_model("results/baseline_cnn_best.keras"),
+    "DenseNet121 (AUC 0.857)": keras.models.load_model("results/densenet_best.keras"),
+}
 
 
-def make_gradcam_heatmap(img_array, pred_index):
+def get_last_conv_layer(model):
+    last_conv = None
+    for layer in model.layers:
+        if isinstance(layer, layers.Conv2D):
+            last_conv = layer
+        elif hasattr(layer, 'layers'):
+            inner = get_last_conv_layer(layer)
+            if inner:
+                last_conv = inner
+    return last_conv
+
+
+def make_gradcam_heatmap(img_array, model, conv_layer, pred_index):
     grad_model = keras.Model(
         inputs=model.inputs,
-        outputs=[model.get_layer(last_conv_layer_name).output, model.output],
+        outputs=[conv_layer.output, model.output],
     )
     with tf.GradientTape() as tape:
         conv_output, preds = grad_model(img_array)
@@ -49,19 +56,19 @@ def superimpose_heatmap(img_array, heatmap, alpha=0.4):
     return keras.utils.array_to_img(superimposed)
 
 
-def predict(image):
-    # Preprocess
+def predict(image, model_name):
+    model = models[model_name]
+    conv_layer = get_last_conv_layer(model)
+
     img = Image.fromarray(image).convert("RGB").resize((224, 224))
     img_array = np.array(img) / 255.0
     img_expanded = np.expand_dims(img_array, axis=0)
 
-    # Predict
     preds = model.predict(img_expanded, verbose=0)[0]
     scores = {label: float(preds[i]) for i, label in enumerate(LABELS)}
 
-    # Grad-CAM for the highest-scoring condition
     top_idx = int(np.argmax(preds))
-    heatmap = make_gradcam_heatmap(img_expanded, top_idx)
+    heatmap = make_gradcam_heatmap(img_expanded, model, conv_layer, top_idx)
     gradcam_img = superimpose_heatmap(img_array, heatmap)
 
     return scores, gradcam_img
@@ -71,22 +78,36 @@ with gr.Blocks(title="CheXpert Disease Detection") as demo:
     gr.Markdown(
         "# Chest X-Ray Disease Detection\n"
         "Upload a frontal chest X-ray to get predictions for 5 conditions. "
-        "The Grad-CAM heatmap shows which regions influenced the top prediction."
+        "The Grad-CAM heatmap shows which regions of the image influenced the top prediction."
     )
     with gr.Row():
         with gr.Column():
             image_input = gr.Image(label="Upload chest X-ray", type="numpy")
+            model_selector = gr.Radio(
+                choices=list(models.keys()),
+                value="Baseline CNN (AUC 0.865)",
+                label="Select model"
+            )
             submit_btn = gr.Button("Analyse", variant="primary")
         with gr.Column():
             label_output = gr.Label(label="Prediction scores", num_top_classes=5)
             gradcam_output = gr.Image(label="Grad-CAM (top condition)")
 
-    submit_btn.click(fn=predict, inputs=image_input, outputs=[label_output, gradcam_output])
+    gr.Examples(
+        examples=[
+            ["examples/edema.jpg", "Baseline CNN (AUC 0.865)"],
+            ["examples/pleural_effusion.jpg", "Baseline CNN (AUC 0.865)"],
+            ["examples/cardiomegaly.jpg", "Baseline CNN (AUC 0.865)"],
+        ],
+        inputs=[image_input, model_selector],
+        label="Example X-rays (click to load)"
+    )
+
+    submit_btn.click(fn=predict, inputs=[image_input, model_selector], outputs=[label_output, gradcam_output])
 
     gr.Markdown(
-        "**Model:** Baseline CNN trained on CheXpert (mean AUC 0.865)  \n"
         "**Conditions:** Atelectasis, Cardiomegaly, Consolidation, Edema, Pleural Effusion  \n"
-        "**Note:** This is a research prototype and not a clinical tool."
+        "**Note:** This is a research prototype and not a clinical diagnostic tool."
     )
 
 if __name__ == "__main__":
