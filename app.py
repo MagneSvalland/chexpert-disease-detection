@@ -58,7 +58,6 @@ def superimpose_heatmap(img_array, heatmap, alpha=0.4):
 
 def predict(image, model_name):
     model = models[model_name]
-    conv_layer = get_last_conv_layer(model)
 
     img = Image.fromarray(image).convert("RGB").resize((224, 224))
     img_array = np.array(img) / 255.0
@@ -68,8 +67,12 @@ def predict(image, model_name):
     scores = {label: float(preds[i]) for i, label in enumerate(LABELS)}
 
     top_idx = int(np.argmax(preds))
-    heatmap = make_gradcam_heatmap(img_expanded, model, conv_layer, top_idx)
-    gradcam_img = superimpose_heatmap(img_array, heatmap)
+    try:
+        conv_layer = get_last_conv_layer(model)
+        heatmap = make_gradcam_heatmap(img_expanded, model, conv_layer, top_idx)
+        gradcam_img = superimpose_heatmap(img_array, heatmap)
+    except Exception:
+        gradcam_img = Image.fromarray(np.uint8(img_array * 255))
 
     return scores, gradcam_img
 
