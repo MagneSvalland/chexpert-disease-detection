@@ -56,13 +56,14 @@ def predict(image, threshold):
     rows = []
     for i, label in enumerate(LABELS):
         score = float(preds[i])
-        detected = "Yes" if score >= threshold else "No"
-        if score >= 0.6:
+        detected = score >= threshold
+        if detected and score >= 0.6:
             indicator = "🔴"
-        elif score >= threshold:
+        elif detected:
             indicator = "🟡"
         else:
             indicator = "🟢"
+        detected = "Yes" if detected else "No"
         rows.append([indicator, label, f"{score:.1%}", detected])
 
     result_md = "| | Condition | Score | Detected |\n|---|---|---|---|\n"
