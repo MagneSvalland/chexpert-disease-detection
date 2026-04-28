@@ -53,7 +53,6 @@ def predict(image, threshold):
 
     preds = model.predict(img_expanded, verbose=0)[0]
 
-    # Build result table with threshold-based classification
     rows = []
     for i, label in enumerate(LABELS):
         score = float(preds[i])
@@ -75,23 +74,29 @@ def predict(image, threshold):
 
     top_label = LABELS[top_idx]
     top_score = float(preds[top_idx])
-
     return result_md, gradcam_img, f"**Top prediction:** {top_label} ({top_score:.1%})"
 
 
 with gr.Blocks(
     title="CheXpert Disease Detection",
-    theme=gr.themes.Soft(primary_hue="blue", neutral_hue="slate")
+    theme=gr.themes.Default(
+        primary_hue="slate",
+        neutral_hue="gray",
+        font=gr.themes.GoogleFont("Inter")
+    ),
+    css="""
+        .gr-button-primary { background: #1e3a5f !important; }
+        .gr-image { border-radius: 8px; }
+    """
 ) as demo:
     gr.Markdown(
-        "# Chest X-Ray Disease Detection\n"
-        "Upload a frontal chest X-ray to receive predictions for 5 conditions. "
-        "The Grad-CAM heatmap highlights the regions that most influenced the prediction."
+        "## Chest X-Ray Disease Detection\n"
+        "Upload a frontal chest X-ray to receive predictions for 5 conditions."
     )
 
     with gr.Row():
         with gr.Column(scale=1):
-            image_input = gr.Image(label="Upload chest X-ray", type="numpy")
+            image_input = gr.Image(label="Chest X-ray", type="numpy")
             threshold_slider = gr.Slider(
                 minimum=0.1, maximum=0.9, value=0.5, step=0.05,
                 label="Detection threshold",
@@ -101,17 +106,17 @@ with gr.Blocks(
 
         with gr.Column(scale=1):
             top_pred_output = gr.Markdown()
-            result_table = gr.Markdown(label="Results")
-            gradcam_output = gr.Image(label="Grad-CAM heatmap (top condition)")
+            result_table = gr.Markdown()
+            gradcam_output = gr.Image(label="Grad-CAM heatmap")
 
     gr.Examples(
         examples=[
-            ["examples/edema.jpg", 0.5],
-            ["examples/pleural_effusion.jpg", 0.5],
-            ["examples/cardiomegaly.jpg", 0.5],
+            ["examples/edema_strong.jpg"],
+            ["examples/pleural_effusion.jpg"],
+            ["examples/cardiomegaly.jpg"],
         ],
-        inputs=[image_input, threshold_slider],
-        label="Example X-rays (click to load)"
+        inputs=[image_input],
+        label="Example X-rays"
     )
 
     submit_btn.click(
@@ -122,9 +127,9 @@ with gr.Blocks(
 
     gr.Markdown(
         "---\n"
-        "**Model:** Baseline CNN trained on CheXpert (mean AUROC: 0.865) | "
-        "**Conditions:** Atelectasis, Cardiomegaly, Consolidation, Edema, Pleural Effusion  \n"
-        "⚠️ This is a research prototype and not a clinical diagnostic tool."
+        "Model: Baseline CNN · Mean AUROC: 0.865 · "
+        "Conditions: Atelectasis, Cardiomegaly, Consolidation, Edema, Pleural Effusion  \n"
+        "Research prototype - not a clinical diagnostic tool."
     )
 
 if __name__ == "__main__":
