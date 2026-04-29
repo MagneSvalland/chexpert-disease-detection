@@ -12,6 +12,10 @@ The model is deployed as a web application where users can upload a chest X-ray 
 
 **https://huggingface.co/spaces/Magnen/chexpert-disease-detection**
 
+Example picture:
+<img width="1900" height="912" alt="image" src="https://github.com/user-attachments/assets/46a9dbf6-321f-4c42-a829-011b45b38d2d" />
+
+
 ## Models
 
 | Model | Mean AUC |
